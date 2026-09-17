@@ -3,6 +3,7 @@ package com.norblis.qoct.processor
 import com.norblis.common.concurrency.suspendingParallelFor
 import com.norblis.common.progress.MutableProgressState
 import com.norblis.qoct.QoctData
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import kotlin.coroutines.coroutineContext
 import kotlin.math.min
@@ -93,7 +94,7 @@ class QoctProcessor(
             val iterator = data.get(step)
             var frameIndex = 0L
             val sumArray = sumArrays[thread]
-            while (iterator.hasNext() && frameIndex < effectiveSamplesPerStep && coroutineContext.isActive) {
+            while (iterator.hasNext() && frameIndex < effectiveSamplesPerStep && currentCoroutineContext().isActive) {
                 val frame = iterator.next()
                 for (i in 0 until frameSize) {
                     sumArray[i] = sumArray[i] + frame.get(i)
@@ -109,22 +110,10 @@ class QoctProcessor(
 
 
         // Find the two largest elements.
-        var highestValue = -1L
-        var secondHighestValue = -1L
-        var highestIndex = 0
-        var secondHighestIndex = 0
-
-        if (sumArray[0] > sumArray[1]) {
-            highestValue = sumArray[0]
-            highestIndex = 0
-            secondHighestIndex = 1
-            secondHighestValue = sumArray[1]
-        } else {
-            highestValue = sumArray[1]
-            highestIndex = 1
-            secondHighestValue = sumArray[0]
-            secondHighestIndex = 0
-        }
+        var highestValue = Long.MIN_VALUE
+        var secondHighestValue = Long.MIN_VALUE
+        var highestIndex = -1
+        var secondHighestIndex = -1
 
         for (i in sumArray.indices) {
             val e = sumArray[i]

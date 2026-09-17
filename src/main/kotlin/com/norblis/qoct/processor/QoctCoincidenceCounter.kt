@@ -58,6 +58,16 @@ class QoctCoincidenceCounter(
         }
     }
 
+    fun totalCoincidenceCount(): Long {
+        return coincidenceCounts.sum()
+    }
+
+    fun coincidenceCount(step: Int): Long {
+        return coincidenceCounts[step]
+    }
+
+
+
     fun resultAsAccidentalCoincidenceCounts(voxelData: MutableVoxelData<Long>) {
         check(hasResult)
         voxelData.resize(1, 1, accidentalCoincidenceCounts.size)
